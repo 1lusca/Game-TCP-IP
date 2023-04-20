@@ -79,42 +79,42 @@ class Server {
                            
                                 if(settings[0] == settings[1]) { // verifica se todos os jogadores ja jogaram
                                 
-                                // gira a roleta
-                                Random random = new Random();
-                                int numeroRoleta = random.nextInt(36) + 1;
-                                //int numeroRoleta = 10;
+                                    // gira a roleta
+                                    Random random = new Random();
+                                    int numeroRoleta = random.nextInt(36) + 1;
+                                    //int numeroRoleta = 10;
 
-                                synchronized (conexoes) {
+                                    synchronized (conexoes) {
                                     
-                                    int aux = 0;
-                                    
-                                    for (Socket conexao : conexoes) { // varre a lista de conexoes para verificar se os jogadores ganharam e enviar o resultado
+                                        int aux = 0;
                                         
-                                        String resultado;
-                                        
-                                        // verifica se o jogador atual ganhou
-                                        if(numeroRoleta == jogadas[aux]) {
-                                            saldo[aux] = saldo[aux] + fichas[aux]*2;
-                                            resultado = "Voce ganhou "+saldo[aux]+" fichas, seu saldo atual: "+saldo[aux]+'\n';
-                                        } else {
-                                            resultado = "Voce perdeu :c | Numero ganhador: "+numeroRoleta+" | Voce jogou: "+jogadas[aux]+" | Voce perdeu: "+fichas[aux]+" fichas, seu saldo atual: "+saldo[aux]+"\n";
+                                        for (Socket conexao : conexoes) { // varre a lista de conexoes para verificar se os jogadores ganharam e enviar o resultado
+                                            
+                                            String resultado;
+                                            
+                                            // verifica se o jogador atual ganhou
+                                            if(numeroRoleta == jogadas[aux]) {
+                                                saldo[aux] = saldo[aux] + fichas[aux]*2;
+                                                resultado = "Voce ganhou "+saldo[aux]+" fichas, seu saldo atual: "+saldo[aux]+'\n';
+                                            } else {
+                                                resultado = "Voce perdeu :c | Numero ganhador: "+numeroRoleta+" | Voce jogou: "+jogadas[aux]+" | Voce perdeu: "+fichas[aux]+" fichas, seu saldo atual: "+saldo[aux]+"\n";
+                                            }
+                                            
+                                            // controle 
+                                            aux = aux + 1;
+
+                                            // envia o resultado da rodada para os jogadores
+                                            DataOutputStream sender = new DataOutputStream(conexao.getOutputStream());
+                                            sender.writeBytes(resultado);
                                         }
-                                        
-                                        // controle 
-                                        aux = aux + 1;
 
-                                        // envia o resultado da rodada para os jogadores
-                                        DataOutputStream sender = new DataOutputStream(conexao.getOutputStream());
-                                        sender.writeBytes(resultado);
+                                        // reseta as jogadas para uma nova rodada
+                                        settings[1] = 0;
+                                        jogadas[0] = 0;
+                                        jogadas[1] = 0;
+
                                     }
-
-                                    // reseta as jogadas para uma nova rodada
-                                    settings[1] = 0;
-                                    jogadas[0] = 0;
-                                    jogadas[1] = 0;
-
                                 }
-                            }
 
                             }
 
