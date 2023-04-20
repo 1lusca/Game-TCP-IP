@@ -12,15 +12,16 @@ class Server {
         List<Socket> conexoes = new ArrayList<>(); // lista que vai armazenas as conexoes
 
         int[] settings = new int[2];
-        settings[0] = 0; //numero de conexoes
-        settings[1] = 0; //jogadas feitas
+        settings[0] = 0; // numero de conexoes
+        settings[1] = 0; // jogadas feitas
 
         int[] jogadas = new int[2]; // armazena as jogadas 
+
         int[] fichas = new int[2]; // fichas apostadas na rodada
 
-        int[] saldo = new int[2];
-        saldo[0] = 1000;
-        saldo[1] = 1000;
+        int[] saldo = new int[2]; // saldo de fichas dos players
+        saldo[0] = 1000; // player 1
+        saldo[1] = 1000; // player 2
   
         while (true) {
 
@@ -49,7 +50,7 @@ class Server {
 
                                 int aposta = Integer.parseInt(jogada.replace(" fichas", ""));
                                 
-                                // salva a jogada 
+                                // salva a jogada (numero e fichas)
                                 if(conexoes.get(0) == socketConexao) {
                                     fichas[0] = aposta;
                                     saldo[0] = saldo[0] - aposta;

@@ -11,9 +11,6 @@ public class Client {
         settings[0] = false;
         settings[1] = false;
 
-        // int[] saldo = new int[1];
-        // saldo[0] =  1000;
-
         BufferedReader readerTeclado = new BufferedReader(new InputStreamReader(System.in)); // le o teclado
         Socket socket = new Socket("127.0.0.1", 6789); // socket do jogador
         DataOutputStream sender = new DataOutputStream(socket.getOutputStream()); // envia pro server
@@ -26,14 +23,6 @@ public class Client {
                 String retornoServidor;
                 while ((retornoServidor = reader.readLine()) != null) {
                     System.out.println("Resultado da rodada: " + retornoServidor);
-
-                    // synchronized(saldo) {
-                    //     if(retornoServidor.contains("ganhou")) {
-                    //         saldo[0] = saldo[0] + Integer.parseInt(retornoServidor.replace("Voce ganhou ", ""));
-                    //     }
-                    //     System.out.println("Seu saldo de fichas: " + saldo[0]);
-                    // }
-
                     synchronized(settings) {
                         settings[0] = false;
                     }
@@ -50,7 +39,7 @@ public class Client {
                     
 
 
-                    if(settings[1] == false) {
+                    if(settings[1] == false) { // envia a aposta (fichas)
 
                         System.out.print("\n----- Nova rodada -----\n");
 
@@ -60,11 +49,9 @@ public class Client {
 
                         String fichas = readerTeclado.readLine();
 
-                        //saldo[0] = saldo[0] - Integer.parseInt(fichas);
-
                         sender.writeBytes(fichas +" fichas"+ '\n');
 
-                    } else {
+                    } else { // envia a aposta (numero)
 
                         settings[1] = false;
 
@@ -77,6 +64,7 @@ public class Client {
                         settings[0] = true; // atualiza o controle de jogadas
 
                         System.out.print("Aguardando o giro da roleta...\n");
+                        
                     }
                 }
             }
