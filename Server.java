@@ -42,8 +42,7 @@ class Server {
 
                         String jogada = doCliente.readLine(); // le a jogada do jogador
                         
-
-
+                        // protocolo de apostas das fichas
                         if(jogada.contains("fichas")) {
                         
                             synchronized(jogadas) {
@@ -61,41 +60,24 @@ class Server {
                                  
                             }
 
+                        } else { // protocolo numero apostado
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-                        } else {
-
-
-
-
-                        synchronized(settings) { // garante o controle de concorrencia entre threads (todo synchronized faz isso com variaves globais) 
+                            synchronized(settings) { // garante o controle de concorrencia entre threads (todo synchronized faz isso com variaves globais) 
                             
-                            synchronized(jogadas) {
+                                synchronized(jogadas) {
                                 
-                                // salva a jogada 
-                                if(conexoes.get(0) == socketConexao) {
-                                    jogadas[0] = Integer.parseInt(jogada);
-                                } else {
-                                    jogadas[1] = Integer.parseInt(jogada);
-                                }
+                                    // salva a jogada 
+                                    if(conexoes.get(0) == socketConexao) {
+                                        jogadas[0] = Integer.parseInt(jogada);
+                                    } else {
+                                        jogadas[1] = Integer.parseInt(jogada);
+                                    }
                                  
-                            }
+                                }
 
-                            settings[1] = settings[1] + 1; // incrementa o numero de jogadas feitas
+                                settings[1] = settings[1] + 1; // incrementa o numero de jogadas feitas
                            
-                            if(settings[0] == settings[1]) { // verifica se todos os jogadores ja jogaram
+                                if(settings[0] == settings[1]) { // verifica se todos os jogadores ja jogaram
                                 
                                 // gira a roleta
                                 Random random = new Random();
@@ -118,11 +100,8 @@ class Server {
                                             resultado = "Voce perdeu :c | Numero ganhador: "+numeroRoleta+" | Voce jogou: "+jogadas[aux]+" | Voce perdeu: "+fichas[aux]+" fichas, seu saldo atual: "+saldo[aux]+"\n";
                                         }
                                         
-                                        System.out.println(jogadas[0]);
-                                        System.out.println(jogadas[1]);
+                                        // controle 
                                         aux = aux + 1;
-                                        
-                                        
 
                                         // envia o resultado da rodada para os jogadores
                                         DataOutputStream sender = new DataOutputStream(conexao.getOutputStream());
@@ -137,19 +116,10 @@ class Server {
                                 }
                             }
 
+                            }
+
                         }
 
-                            
-
-                        
-                    }
-
-
-
-
-
-
-                        
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
