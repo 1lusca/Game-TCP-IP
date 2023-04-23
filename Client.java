@@ -6,24 +6,35 @@ import java.net.Socket;
 public class Client {
     public static void main(String argv[]) throws Exception {
         
-        // verifica se o jogador ja jogou
+        // controle que verifica se o jogador ja jogou
         boolean[] settings = new boolean[2];
         settings[0] = false;
         settings[1] = false;
-
-        BufferedReader readerTeclado = new BufferedReader(new InputStreamReader(System.in)); // le o teclado
-        Socket socket = new Socket("127.0.0.1", 6789); // socket do jogador
-        DataOutputStream sender = new DataOutputStream(socket.getOutputStream()); // envia pro server
-        BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream())); // recebe do server
+        
+        // le o teclado
+        BufferedReader readerTeclado = new BufferedReader(new InputStreamReader(System.in));
+        
+        // socket de cliente
+        Socket socket = new Socket("127.0.0.1", 6789);
+        
+        // stream que envia para o server
+        DataOutputStream sender = new DataOutputStream(socket.getOutputStream()); 
+        
+        // strea que le o server
+        BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream())); 
 
         // cria e inicia uma thread apenas para ficar ouvindo o servidor
         // isso permite receber mensagens do server sem precisar fazer um request
         new Thread(() -> {
             try {
+                
+                // le o que o server envia
                 String retornoServidor;
                 while ((retornoServidor = reader.readLine()) != null) {
                     System.out.println("Resultado da rodada: " + retornoServidor);
                     synchronized(settings) {
+                        
+                        // reseta para uma nova rodada
                         settings[0] = false;
                     }
                 }
@@ -32,23 +43,27 @@ public class Client {
             }
         }).start();
 
-        // envia as mensagens para o server
+        // processo principal que  envia as mensagens para o server
         while (true) { 
-            synchronized(settings) { // garante o controle de concorrencia
-                if(settings[0] == false) { // verifica se o jogador ja jogou
+           
+            synchronized(settings) {
+                
+                // verifica se o jogador ja jogou
+                if(settings[0] == false) {
                     
-
-
-                    if(settings[1] == false) { // envia a aposta (fichas)
+                    // inicia a aposta e envia a posta de fichas
+                    if(settings[1] == false) {
 
                         System.out.print("\n----- Nova rodada -----\n");
 
+                        // atualiza o controle de jogadas
                         settings[1] = true;
 
                         System.out.print("Quantas fichas: ");
 
                         String fichas = readerTeclado.readLine();
 
+                        // envia a quantidade de fichas apostadas
                         sender.writeBytes(fichas +" fichas"+ '\n');
 
                     } else { // envia a aposta (numero)
@@ -57,11 +72,13 @@ public class Client {
 
                         System.out.print("Qual a sua jogada (numero): ");
 
-                        String jogada = readerTeclado.readLine(); // le a jogada do teclado
+                        String jogada = readerTeclado.readLine();
 
-                        sender.writeBytes(jogada + '\n'); // envia a jogada para o servidor
+                        // envia a jogada 
+                        sender.writeBytes(jogada + '\n');
 
-                        settings[0] = true; // atualiza o controle de jogadas
+                        // atualiza o controle de jogadas
+                        settings[0] = true;
 
                         System.out.print("Aguardando o giro da roleta...\n");
                         

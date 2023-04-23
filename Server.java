@@ -7,50 +7,64 @@ import java.util.Random;
 class Server {
     public static void main(String argv[]) throws Exception {
         
-        ServerSocket socket = new ServerSocket(6789); // cria um socket que escuta por novas conexoes
+        // cria um socket que escuta por novas conexoes
+        ServerSocket socket = new ServerSocket(6789); 
         
-        List<Socket> conexoes = new ArrayList<>(); // lista que vai armazenas as conexoes
+        // lista que vai armazenas as conexoes
+        List<Socket> conexoes = new ArrayList<>(); 
 
+        // controle
         int[] settings = new int[2];
         settings[0] = 0; // numero de conexoes
         settings[1] = 0; // jogadas feitas
 
-        int[] jogadas = new int[2]; // armazena as jogadas 
+        // armazena as jogadas
+        int[] jogadas = new int[2];
 
-        int[] fichas = new int[2]; // fichas apostadas na rodada
+        // armazena as fichadas apostadas
+        int[] fichas = new int[2];
 
-        int[] saldo = new int[2]; // saldo de fichas dos players
+        // controle do saldo de fichas dos players
+        int[] saldo = new int[2];
         saldo[0] = 1000; // player 1
         saldo[1] = 1000; // player 2
   
         while (true) {
 
-            Socket socketConexao = socket.accept(); // cria um socket toda vez que uma nova conexoes e feita
+            // socket para cada nova conexao
+            Socket socketConexao = socket.accept();
             
-            conexoes.add(socketConexao); // adiciona esse socket de uma nova conexao em uma lista
+            // adiciona o sockets na lista de conexoes
+            conexoes.add(socketConexao);
 
+            // incrementa o numero de conexoes
             synchronized(settings) {
-                settings[0] = settings[0] + 1; // incrementa o numero de conexoes
+                settings[0] = settings[0] + 1;
             }
-            // cria uma nova thread para cada jogador
+
+            // cria uma nova thread para cada jogador (conexao)
             // isso vai garantir que cada conexao tenha uma thread para si propria, garantindo multiplas conexoes
             new Thread(() -> {
                 try {
                     
-                    BufferedReader doCliente = new BufferedReader(new InputStreamReader(socketConexao.getInputStream())); // stream que le a jogada recebida
+                    // stream que le o que o cliente envia
+                    BufferedReader doCliente = new BufferedReader(new InputStreamReader(socketConexao.getInputStream()));
 
-                    while (true) { // loop que fica ouvindo novas jogadas
+                    // loop que fica ouvindo novas jogadas
+                    while (true) { 
 
-                        String jogada = doCliente.readLine(); // le a jogada do jogador
+                        // le a jogada (fichas e numero)
+                        String jogada = doCliente.readLine();
                         
                         // protocolo de apostas das fichas
                         if(jogada.contains("fichas")) {
                         
                             synchronized(jogadas) {
 
+                                // le quantas fichas foram apostadas
                                 int aposta = Integer.parseInt(jogada.replace(" fichas", ""));
                                 
-                                // salva a jogada (numero e fichas)
+                                // atualiza o saldo de fichas e registra quantas fichas foram apostadas
                                 if(conexoes.get(0) == socketConexao) {
                                     fichas[0] = aposta;
                                     saldo[0] = saldo[0] - aposta;
@@ -63,7 +77,7 @@ class Server {
 
                         } else { // protocolo numero apostado
 
-                            synchronized(settings) { // garante o controle de concorrencia entre threads (todo synchronized faz isso com variaves globais) 
+                            synchronized(settings) {
                             
                                 synchronized(jogadas) {
                                 
@@ -75,10 +89,12 @@ class Server {
                                     }
                                  
                                 }
-
-                                settings[1] = settings[1] + 1; // incrementa o numero de jogadas feitas
-                           
-                                if(settings[0] == settings[1]) { // verifica se todos os jogadores ja jogaram
+                                
+                                // incrementa a quantidade de jogadas feitas
+                                settings[1] = settings[1] + 1;
+                                
+                                // verifica se todos jogadores ja jogaram
+                                if(settings[0] == settings[1]) { 
                                 
                                     // gira a roleta
                                     Random random = new Random();
@@ -86,10 +102,12 @@ class Server {
                                     //int numeroRoleta = 10;
 
                                     synchronized (conexoes) {
-                                    
+                                        
+                                        // controle
                                         int aux = 0;
                                         
-                                        for (Socket conexao : conexoes) { // varre a lista de conexoes para verificar se os jogadores ganharam e enviar o resultado
+                                        // percorre a lista de jogadores
+                                        for (Socket conexao : conexoes) { 
                                             
                                             String resultado;
                                             
